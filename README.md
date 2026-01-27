@@ -29,7 +29,7 @@
 
 ---
 
-## Installation
+## Installation (It's not fully published yet)
 
 1. Copy the `Cocobase.gd` file into your Godot project (e.g., `res://addons/cocobase/`).
 2. Make sure the file is included in your project tree.
@@ -137,5 +137,6 @@ Example Scene Setup
 
 License
 -------
+
 
 This SDK is **open source** and free to use in your Godot projects. Attribution is appreciated but not required.
