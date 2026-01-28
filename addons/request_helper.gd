@@ -44,15 +44,15 @@ func create_collection(collectionName: String):
 	};
 	return send_request(validUrl,HTTPClient.METHOD_POST,data_body);
 
-func updateCollection(collectionId:String,newCollectionName:String):
-	var validUrl = "/collection/" + collectionId;
+func updateCollection(collectionName:String,newCollectionName:String):
+	var validUrl = "/collection/" + collectionName;
 	var data_body = {
 		"name":newCollectionName
 	};
 	return send_request(validUrl,HTTPClient.METHOD_PUT,data_body);
 
-func deleteCollection(collectionId:String):
-	var validUrl = "/collection/" + collectionId;
+func deleteCollection(collectionName:String):
+	var validUrl = "/collection/" + collectionName;
 	return send_request(validUrl,HTTPClient.METHOD_DELETE);
 
 func create_document(collectionName:String,data: Dictionary):
@@ -63,31 +63,31 @@ func create_document(collectionName:String,data: Dictionary):
 	};
 	return send_request(validUrl,HTTPClient.METHOD_POST,data_body);
 
-func get_all_documents(collectionId: String):
-	var validUrl = "/collections/" + collectionId + "/documents?limit=50&offset=0";
+func get_all_documents(collectionName: String):
+	var validUrl = "/collections/" + collectionName + "/documents?limit=50&offset=0";
 	return send_request(validUrl,HTTPClient.METHOD_GET);
 
-func getDocument(collectionId:String,documentId:String):
-	var validUrl = "/collections/" + collectionId + '/' + documentId;
+func getDocument(collectionName:String,documentId:String):
+	var validUrl = "/collections/" + collectionName + '/' + documentId;
 	return send_request(validUrl,HTTPClient.METHOD_GET);
 
-func updateDocument(collectionId:String,documentId:String,data: Dictionary):
-	var validUrl = "/collections/" + collectionId + '/' + documentId;
+func updateDocument(collectionName:String,documentId:String,data: Dictionary):
+	var validUrl = "/collections/" + collectionName + '/' + documentId;
 	var data_body = {
 		"data":data
 	};
 	return send_request(validUrl,HTTPClient.METHOD_PUT,data_body);
 
-func deleteDocument(collectionId:String,documentId:String,data: Dictionary):
-	var validUrl = "/collections/" + collectionId + '/' + documentId;
+func deleteDocument(collectionName:String,documentId:String,data: Dictionary):
+	var validUrl = "/collections/" + collectionName + '/' + documentId;
 	return send_request(validUrl,HTTPClient.METHOD_DELETE);
 
-func countDocument(collectionId:String):
-	var validUrl = "/collections/" + collectionId + '/query/documents/count' ;
+func countDocument(collectionName:String):
+	var validUrl = "/collections/" + collectionName + '/query/documents/count' ;
 	return send_request(validUrl,HTTPClient.METHOD_GET);
 
-func exportCollection(collectionId:String):
-	var validUrl = "/collections/" + collectionId + "/export";
+func exportCollection(collectionName:String):
+	var validUrl = "/collections/" + collectionName + "/export";
 	return send_request(validUrl,HTTPClient.METHOD_GET);
 
 
@@ -125,6 +125,6 @@ func verifyEmail(token: String):
 	return send_request(validUrl,HTTPClient.METHOD_POST,data_body);
 
 func resendVerificationEmail():
-	var validUrl = "/auth(-collections/verify-email/resend";
+	var validUrl = "/auth-collections/verify-email/resend";
 	return send_request(validUrl,HTTPClient.METHOD_POST,{});
 

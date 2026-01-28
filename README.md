@@ -60,16 +60,16 @@ func _ready() -> void:
 cocobase.create_collection("MyCollection")
 
 # Update a collection
-cocobase.updateCollection("collection_id_here", "NewCollectionName")
+cocobase.updateCollection("collection_name_here", "NewCollectionName")
 
 # Delete a collection
-cocobase.deleteCollection("collection_id_here")
+cocobase.deleteCollection("collection_name_here")
 
 # Count documents in a collection
-cocobase.countDocument("collection_id_here")
+cocobase.countDocument("collection_name_here")
 
 # Export collection data
-cocobase.exportCollection("collection_id_here")
+cocobase.exportCollection("collection_name_here")
 ```
 ## Working with Documents
 ```gdscript
@@ -78,14 +78,14 @@ var doc_data = {"name": "John", "score": 100}
 cocobase.create_document("MyCollection", doc_data)
 
 # Get a single document
-cocobase.getDocument("collection_id", "document_id")
+cocobase.getDocument("collection_name", "document_id")
 
 # Update a document
 var update_data = {"score": 120}
-cocobase.updateDocument("collection_id", "document_id", update_data)
+cocobase.updateDocument("collection_name", "document_id", update_data)
 
 # Delete a document
-cocobase.deleteDocument("collection_id", "document_id", {})
+cocobase.deleteDocument("collection_name", "document_id", {})
 ```
 ## User Authentication
 ```gdscript
