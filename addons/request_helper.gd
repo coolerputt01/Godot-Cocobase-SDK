@@ -3,7 +3,26 @@ extends Node
 class_name Cocobase
 
 var apiUrl := "https://api.cocobase.buzz";
+var ws_url = ""
 var apiKey := "";
+
+var ws := WebSocketClient.new()
+
+var reconnect_delay = 1.0
+var max_reconnect_delay = 30.0
+var should_reconnect = true
+
+signal connected
+signal message_received(data)
+signal closed
+signal document_created(data)
+signal document_updated(data)
+signal document_deleted(data)
+
+var auth_data = {}
+var current_collection = ""
+var filters = {}
+
 
 func init(_apikey):
 	apiKey = _apikey;
@@ -128,3 +147,86 @@ func resendVerificationEmail():
 	var validUrl = "/auth-collections/verify-email/resend";
 	return send_request(validUrl,HTTPClient.METHOD_POST,{});
 
+
+func _process(delta):
+	if ws and ws.get_connection_status() != WebSocketClient.CONNECTION_DISCONNECTED:
+		ws.poll()
+
+
+func _start_websocket():
+	# Always recreate socket
+	ws = WebSocketClient.new()
+
+	ws.connect("connection_established", self, "_on_connected")
+	ws.connect("connection_closed", self, "_on_closed")
+	ws.connect("connection_error", self, "_on_closed")
+	ws.connect("data_received", self, "_on_data")
+
+	var err = ws.connect_to_url(ws_url)
+	if err != OK:
+		print("Watcher connection error")
+
+	set_process(true)
+
+
+func _on_connected(protocol):
+	reconnect_delay = 1.0
+	send(auth_data)
+	emit_signal("connected")
+
+func _on_closed(was_clean = false):
+	emit_signal("closed")
+
+	if should_reconnect and current_collection != "":
+		yield(get_tree().create_timer(reconnect_delay), "timeout")
+		reconnect_delay = min(reconnect_delay * 2, max_reconnect_delay)
+		_start_websocket()
+
+func _on_data():
+	var peer = ws.get_peer(1)
+	var pkt = peer.get_packet().get_string_from_utf8()
+
+	var parsed = JSON.parse(pkt)
+	if parsed.error != OK:
+		print("Invalid JSON")
+		return
+
+	var data = parsed.result
+	var event_type = data.get("event", "")
+
+	match event_type:
+		"connected":
+			emit_signal("connected", data)
+		"create":
+			emit_signal("document_created", data)
+		"update":
+			emit_signal("document_updated", data)
+		"delete":
+			emit_signal("document_deleted", data)
+		_:
+			print("Unknown event:", event_type)
+
+
+func send(data):
+		if ws.get_connection_status() == WebSocketClient.CONNECTION_CONNECTED:
+			var json = JSON.print(data)
+			ws.get_peer(1).put_packet(json.to_utf8())
+
+
+func close():
+	should_reconnect = false
+	ws.disconnect_from_host()
+
+func watch_collection(collection_name:String, _filters:Dictionary = {}):
+	current_collection = collection_name
+	filters = _filters
+
+	ws_url = apiUrl.replace("https://", "wss://").replace("http://", "ws://")
+	ws_url += "/realtime/collections/" + collection_name
+
+	auth_data = {
+		"api_key": apiKey,
+		"filters": filters
+	}
+
+	_start_websocket()
